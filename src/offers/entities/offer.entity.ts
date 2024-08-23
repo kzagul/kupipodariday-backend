@@ -5,14 +5,12 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
-  ManyToMany,
-  JoinTable,
 } from 'typeorm';
 import { User } from '@users/entities/user.entity';
 import { Wish } from '@wishes/entities/wish.entity';
 
 @Entity()
-export class Wishlist {
+export class Offer {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -22,19 +20,15 @@ export class Wishlist {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ length: 250 })
-  name: string;
+  @ManyToOne(() => User, (user) => user.offers)
+  user: User;
 
-  @Column({ length: 1500 })
-  description: string;
+  @ManyToOne(() => Wish, (wish) => wish.offers)
+  item: Wish;
 
-  @Column()
-  image: string;
+  @Column('decimal', { precision: 10, scale: 2 })
+  amount: number;
 
-  @ManyToMany(() => Wish)
-  @JoinTable()
-  items: Wish[];
-
-  @ManyToOne(() => User, (user) => user.wishlists)
-  owner: User;
+  @Column({ default: false })
+  hidden: boolean;
 }

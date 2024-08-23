@@ -16,6 +16,15 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@auth/*": ["src/auth/*"],
+      "@config/*": ["src/config/*"],
+      // "@helpers/*": ["src/helpers/*"],
+      "@offers/*": ["src/offers/*"],
+      "@users/*": ["src/users/*"],
+      "@wishes/*": ["src/wishes/*"],
+      "@wishlists/*": ["src/wishlists/*"]
+    }
   }
 }
