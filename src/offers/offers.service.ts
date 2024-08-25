@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
@@ -12,17 +12,25 @@ export class OffersService {
     private readonly offerRepository: Repository<Offer>,
   ) {}
 
+  async findAll(query: FindManyOptions<Offer> = {}): Promise<Offer[]> {
+    return this.offerRepository.find({
+      relations: ['user'],
+    });
+  }
+
+  async findOne(id: number) {
+    const offer = await this.offerRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
+    if (!offer) {
+      throw new NotFoundException(`Оффер по указанному id ${id} не найден`);
+    }
+    return offer;
+  }
   async create(offer: Partial<Offer>): Promise<Offer> {
     const newOffer = this.offerRepository.create(offer);
     return this.offerRepository.save(newOffer);
-  }
-
-  async findOne(query: any): Promise<Offer | null> {
-    return this.offerRepository.findOne(query);
-  }
-
-  async findAll(query: FindManyOptions<Offer> = {}): Promise<Offer[]> {
-    return this.offerRepository.find(query);
   }
 
   async update(id: number, updateData: Partial<Offer>): Promise<Offer> {

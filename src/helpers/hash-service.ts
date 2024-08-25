@@ -8,6 +8,12 @@ export class HashingService {
     return bcrypt.hash(password, salt);
   }
 
+  async hashValue(value: string, salt: number) {
+    if (value) {
+      return bcrypt.hash(value, salt);
+    }
+  }
+
   async verifyPassword(password: string, hash: string): Promise<boolean> {
     return bcrypt.compare(password, hash);
   }

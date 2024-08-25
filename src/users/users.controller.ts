@@ -15,14 +15,16 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from '@auth/guards/jwt-auth.guard';
 import { HashingService } from '../helpers/hash-service';
 
+// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('users')
-// @UseGuards(AuthGuard('jwt'))
 export class UsersController {
   constructor(
     private readonly usersService: UsersService, // private readonly hashingService: HashingService,
+    private readonly hashingService: HashingService,
   ) {}
 
   @Get('/')
@@ -64,12 +66,41 @@ export class UsersController {
     return this.usersService.remove(+id);
   }
 
-  @Get('search/:query')
-  async searchUser(@Param('query') query: string) {
-    const users = await this.usersService.findMany(query);
-    if (!users || users.length === 0) {
-      throw new NotFoundException('No users found with that query');
+  // @Get('search/:query')
+  @Post('find')
+  async findMany(@Query('query') query: string) {
+    return this.usersService.findUser(query);
+  }
+  // async searchUser(@Param('query') query: string) {
+  //   return this.usersService.findMany(query);
+  // }
+
+  @Get('search/:username')
+  async getUserByUsername(@Param('username') username: string) {
+    return this.usersService.findUserByUsername(username);
+  }
+
+  @Get('/profile')
+  async getProfile(@Request() req) {
+    const user = await this.usersService.findOne({
+      where: { id: req.user.userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
-    return users;
+    return user;
+  }
+
+  // Метод для редактирования своего профиля
+  @Put()
+  async updateProfile(@Request() req, @Body() updateData: any) {
+    if (updateData.password) {
+      updateData.password = await this.hashingService.hashPassword(
+        updateData.password,
+      );
+    }
+
+    await this.usersService.update(req.user.userId, updateData);
+    return this.usersService.findOne({ where: { id: req.user.userId } });
   }
 }

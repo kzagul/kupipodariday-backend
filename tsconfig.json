@@ -20,7 +20,8 @@
     "paths": {
       "@auth/*": ["src/auth/*"],
       "@config/*": ["src/config/*"],
-      // "@helpers/*": ["src/helpers/*"],
+      "@decorators/*": ["src/decorators/*"],
+      "@helpers/*": ["src/helpers/*"],
       "@offers/*": ["src/offers/*"],
       "@users/*": ["src/users/*"],
       "@wishes/*": ["src/wishes/*"],

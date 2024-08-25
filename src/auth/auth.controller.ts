@@ -1,5 +1,6 @@
 import {
   Controller,
+  Req,
   Get,
   Post,
   Body,
@@ -11,8 +12,10 @@ import { UsersService } from '../users/users.service';
 import { HashingService } from '../helpers/hash-service';
 import { LocalAuthGuard } from './guards/local.guard';
 import { AuthGuard } from '@nestjs/passport';
+import { AuthDecorator } from '@helpers/auth.decorator';
+import { CreateUserDto } from '@users/dto/create-user.dto';
 
-@Controller('auth')
+@Controller()
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
@@ -21,20 +24,15 @@ export class AuthController {
   ) {}
 
   @Post('signup')
-  async signup(@Body() createUserDto: any) {
-    const hashedPassword = await this.hashingService.hashPassword(
-      createUserDto.password,
-    );
-    return this.usersService.create({
-      ...createUserDto,
-      password: hashedPassword,
-    });
+  async signup(@Body() createUserDto: CreateUserDto) {
+    const user = await this.usersService.signup(createUserDto);
+    return user;
   }
 
   @UseGuards(LocalAuthGuard)
   @Post('signin')
-  async signin(@Request() req) {
-    return this.authService.login(req.user);
+  login(@AuthDecorator() user) {
+    return this.authService.login(user);
   }
 
   @UseGuards(AuthGuard('jwt'))

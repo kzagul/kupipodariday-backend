@@ -15,11 +15,6 @@ import { UpdateWishDto } from './dto/update-wish.dto';
 export class WishesController {
   constructor(private readonly wishesService: WishesService) {}
 
-  @Post()
-  create(@Body() createWishDto: CreateWishDto) {
-    return this.wishesService.create(createWishDto);
-  }
-
   @Get()
   findAll() {
     return this.wishesService.findAll();
@@ -38,6 +33,11 @@ export class WishesController {
   @Get('last')
   findLast() {
     return this.wishesService.findLastWishes();
+  }
+
+  @Post()
+  create(@Body() createWishDto: CreateWishDto) {
+    return this.wishesService.create(createWishDto);
   }
 
   @Patch(':id')

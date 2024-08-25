@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { AuthController } from './auth/auth.controller';
 import { UsersController } from '@users/users.controller';
 import { WishesController } from '@wishes/wishes.controller';
 import { WishlistsController } from '@wishlists/wishlists.controller';
@@ -11,6 +12,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import configuration from './config/configuration';
 import { DatabaseConfigFactory } from './config/database';
 
+import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { WishesModule } from './wishes/wishes.module';
 import { WishlistsModule } from './wishlists/wishlists.module';
@@ -26,12 +28,14 @@ import { OffersModule } from './offers/offers.module';
     TypeOrmModule.forRootAsync({
       useClass: DatabaseConfigFactory,
     }),
+    AuthModule,
     UsersModule,
     WishesModule,
     WishlistsModule,
     OffersModule,
   ],
   controllers: [
+    AuthController,
     AppController,
     UsersController,
     WishesController,

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
@@ -13,7 +13,13 @@ export class WishlistsService {
   ) {}
 
   async findAll(): Promise<Wishlist[]> {
-    return this.wishlistRepository.find();
+    const wishlists = await this.wishlistRepository.find({
+      relations: ['user', 'items'],
+    });
+    if (wishlists.length === 0) {
+      throw new NotFoundException(`Еще не было созданно ни одного вишлиста`);
+    }
+    return wishlists;
   }
 
   async findOne(query: any): Promise<Wishlist> {

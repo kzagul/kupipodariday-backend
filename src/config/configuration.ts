@@ -10,7 +10,7 @@ export default () => ({
     name: process.env.POSTGRES_DB_NAME || 'kupipodariday',
   },
   jwt: {
-    secret: process.env.JWT_SECRET || 'secret',
+    secret: process.env.JWT_SECRET || 'secret-key',
     ttl: process.env.JWT_TTL || '30000s',
   },
 });
