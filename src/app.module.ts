@@ -5,13 +5,10 @@ import { UsersController } from '@users/users.controller';
 import { WishesController } from '@wishes/wishes.controller';
 import { WishlistsController } from '@wishlists/wishlists.controller';
 import { OffersController } from '@offers/offers.controller';
-
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
 import configuration from './config/configuration';
 import { DatabaseConfigFactory } from './config/database';
-
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { WishesModule } from './wishes/wishes.module';

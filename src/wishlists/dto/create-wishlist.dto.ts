@@ -6,5 +6,6 @@ export class CreateWishlistDto {
   @IsUrl()
   image: string;
   @IsArray()
-  wishesId: number[];
+  // wishesId: number[];
+  itemsId: number[];
 }

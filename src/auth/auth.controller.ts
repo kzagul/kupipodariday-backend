@@ -1,17 +1,8 @@
-import {
-  Controller,
-  Req,
-  Get,
-  Post,
-  Body,
-  UseGuards,
-  Request,
-} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { HashingService } from '../helpers/hash-service';
 import { LocalAuthGuard } from './guards/local.guard';
-import { AuthGuard } from '@nestjs/passport';
 import { AuthDecorator } from '@helpers/auth.decorator';
 import { CreateUserDto } from '@users/dto/create-user.dto';
 
@@ -33,11 +24,5 @@ export class AuthController {
   @Post('signin')
   login(@AuthDecorator() user) {
     return this.authService.login(user);
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
   }
 }

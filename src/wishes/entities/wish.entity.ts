@@ -33,7 +33,7 @@ export class Wish {
   @IsUrl()
   image: string;
 
-  @Column({ nullable: true })
+  @Column()
   price: number;
 
   @Column({ default: 0 })

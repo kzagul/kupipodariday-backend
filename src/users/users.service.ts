@@ -2,11 +2,12 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Repository, FindOneOptions, FindManyOptions, Like } from 'typeorm';
+import { Repository, FindOneOptions, Like } from 'typeorm';
 import { User } from './entities/user.entity';
 import { HashingService } from '../helpers/hash-service';
 
@@ -18,21 +19,14 @@ export class UsersService {
     private readonly hashingService: HashingService,
   ) {}
 
-  // async findOne(query: any): Promise<User | null> {
-  //   return this.userRepository.findOne(query);
-  // }
-
-  // async findAll(query: FindManyOptions<User> = {}): Promise<User[]> {
-  //   return this.userRepository.find(query);
-  // }
-
-  // async findMany(query: string): Promise<User[]> {
-  //   return this.userRepository.find({
-  //     where: [{ username: Like(`%${query}%`) }, { email: Like(`%${query}%`) }],
-  //   });
-  // }
   async findOne(query: FindOneOptions<User>): Promise<User | null> {
-    return this.userRepository.findOne(query);
+    const user = await this.userRepository.findOne(query);
+    if (!user) {
+      throw new NotFoundException(
+        `Пользователь по указанному запросу: ${query} не найден`,
+      );
+    }
+    return user;
   }
 
   async findAll(): Promise<User[]> {
@@ -45,9 +39,14 @@ export class UsersService {
     });
     if (!user) {
       throw new NotFoundException(
-        `Пользователь по указанному полю ${query} не найден.`,
+        `Пользователь по указанному запросу: ${query} не найден.`,
       );
     }
+    return user;
+  }
+
+  async findById(id: number): Promise<User> {
+    const user = await this.userRepository.findOneBy({ id });
     return user;
   }
 
@@ -57,7 +56,7 @@ export class UsersService {
     });
     if (!user) {
       throw new NotFoundException(
-        `Пользователь по указанному полю ${query} не найден.`,
+        `Пользователь по указанному запросу: ${query} не найден.`,
       );
     }
     return user;
@@ -69,7 +68,7 @@ export class UsersService {
     });
     if (!user) {
       throw new NotFoundException(
-        `Пользователь с именем ${username} не найден.`,
+        `Пользователь с именем: ${username} не найден.`,
       );
     }
     return user;
@@ -80,9 +79,22 @@ export class UsersService {
     return this.userRepository.save(newUser);
   }
 
-  async update(id: number, updateData: Partial<User>): Promise<User> {
-    await this.userRepository.update(id, updateData);
-    return this.userRepository.findOne({ where: { id } });
+  async update(id: number, updateDto: UpdateUserDto) {
+    try {
+      const { password } = updateDto;
+      const user = await this.findById(id);
+      if (password) {
+        updateDto.password = await this.hashingService.hashValue(password, 10);
+      }
+      return await this.userRepository.save({ ...user, ...updateDto });
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException(
+          'Пользователь с таким email или username уже зарегистрирован',
+        );
+      }
+      throw error;
+    }
   }
 
   async remove(id: number): Promise<void> {
@@ -95,7 +107,7 @@ export class UsersService {
     });
     if (existUser) {
       throw new BadRequestException(
-        'Пользователь с таким email уже существует',
+        `Пользователь с email: ${userDto.email} уже существует`,
       );
     }
     const { password } = userDto;
