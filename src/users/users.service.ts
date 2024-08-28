@@ -74,11 +74,6 @@ export class UsersService {
     return user;
   }
 
-  async create(user: Partial<User>): Promise<User> {
-    const newUser = this.userRepository.create(user);
-    return this.userRepository.save(newUser);
-  }
-
   async update(id: number, updateDto: UpdateUserDto) {
     try {
       const { password } = updateDto;
@@ -103,11 +98,11 @@ export class UsersService {
 
   async signup(userDto: CreateUserDto): Promise<User> {
     const existUser = await this.userRepository.findOne({
-      where: { email: userDto.email },
+      where: [{ email: userDto.email }, { username: userDto.username }],
     });
     if (existUser) {
       throw new BadRequestException(
-        `Пользователь с email: ${userDto.email} уже существует`,
+        'Пользователь с таким email или username уже зарегистрирован',
       );
     }
     const { password } = userDto;

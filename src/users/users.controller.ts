@@ -10,7 +10,6 @@ import {
   Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '@auth/guards/jwt-auth.guard';
 import { HashingService } from '../helpers/hash-service';
@@ -56,11 +55,6 @@ export class UsersController {
   async getWishesByUsername(@Param('username') username: string) {
     const user = await this.usersService.findUserByUsername(username);
     return this.wishesService.findUserWishes(user.id);
-  }
-
-  @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
   }
 
   @Patch('/me')
